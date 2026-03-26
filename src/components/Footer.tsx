@@ -36,7 +36,7 @@ const Footer = () => (
       </div>
       <div className="line-gold mt-12 mb-8" />
       <div className="text-center text-xs text-muted-foreground/50 uppercase tracking-wider">
-        © 2026 CuzAura. All rights reserved. Handcrafted in India.
+        © 2026 CusAura. All rights reserved. Handcrafted in India.
       </div>
     </div>
   </footer>

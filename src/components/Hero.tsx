@@ -26,16 +26,16 @@ const Hero = () => (
             className="inline-block mb-6"
           >
             <span className="text-xs uppercase tracking-[0.4em] text-gold/70 font-medium border border-gold/20 rounded-full px-5 py-2">
-              Handcrafted Since 2020
+              Walk Beyond Ordinary
             </span>
           </motion.div>
 
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[0.9] mb-6">
-            Cuz<span className="text-gradient">Aura</span>
+            Cus<span className="text-gradient">Aura</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-3 font-light italic">
-            Wear Your Aura
+            Step Into Your Aura
           </p>
           <p className="text-base text-muted-foreground/70 mb-10 max-w-lg leading-relaxed">
             India's premier destination for bespoke leather footwear. Every pair is handcrafted by master artisans using the world's finest leathers.
@@ -62,7 +62,7 @@ const Hero = () => (
           </div>
           <motion.img
             src={heroShoe}
-            alt="CuzAura handcrafted leather shoe"
+            alt="CusAura handcrafted leather shoe"
             width={1024}
             height={1024}
             className="w-full max-w-lg drop-shadow-2xl relative z-10"

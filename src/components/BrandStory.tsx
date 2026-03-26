@@ -39,7 +39,7 @@ const BrandStory = () => (
           </h2>
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              CuzAura was born from a single conviction: that exceptional leather footwear should be accessible to every discerning gentleman, not just the elite few.
+              CusAura was born from a single conviction: that exceptional leather footwear should be accessible to every discerning gentleman, not just the elite few.
             </p>
             <p>
               Our master artisans bring over three decades of experience to every pair, using time-honoured techniques passed down through generations of Indian shoemakers — combined with contemporary design sensibilities.

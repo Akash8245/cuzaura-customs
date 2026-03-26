@@ -1,8 +1,49 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { products, formatPrice } from "@/lib/data";
+import { formatPrice } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
+import { Loader } from "lucide-react";
 
-const FeaturedShoes = () => (
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  color: string;
+  category: string;
+  image_url?: string;
+  description: string;
+  is_active: boolean;
+}
+
+const FeaturedShoes = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  return (
   <section className="py-28 bg-card/30">
     <div className="container mx-auto px-6">
       <motion.div
@@ -17,37 +58,56 @@ const FeaturedShoes = () => (
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {products.slice(0, 3).map((p, i) => (
-          <motion.div
-            key={p.id}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.15, duration: 0.6 }}
-          >
-            <Link to={`/collection/${p.id}`} className="group block">
-              <div className="relative bg-secondary rounded-xl overflow-hidden aspect-square mb-5">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  width={800}
-                  height={800}
-                  className="w-full h-full object-contain p-10 transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gold/0 group-hover:bg-gold/[0.03] transition-colors duration-500" />
-                <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.2em] text-gold/60 font-medium">{p.category}</span>
-              </div>
-              <div className="flex items-end justify-between">
-                <div>
-                  <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-gold transition-colors duration-300">{p.name}</h3>
-                  <p className="text-sm text-muted-foreground">{p.color} Leather</p>
+        {loading ? (
+          <div className="col-span-full flex items-center justify-center py-20">
+            <div className="text-center">
+              <Loader className="w-8 h-8 text-gold animate-spin mx-auto mb-3" />
+              <p className="text-muted-foreground">Loading featured shoes...</p>
+            </div>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="col-span-full text-center py-20">
+            <p className="text-muted-foreground">No products available yet.</p>
+          </div>
+        ) : (
+          products.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15, duration: 0.6 }}
+            >
+              <Link to={`/collection/${p.id}`} className="group block">
+                <div className="relative bg-secondary rounded-xl overflow-hidden aspect-square mb-5">
+                  {p.image_url ? (
+                    <img
+                      src={p.image_url}
+                      alt={p.name}
+                      loading="lazy"
+                      width={800}
+                      height={800}
+                      className="w-full h-full object-contain p-10 transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-800/50">
+                      <span className="text-gray-400 text-sm">No image</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gold/0 group-hover:bg-gold/[0.03] transition-colors duration-500" />
+                  <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.2em] text-gold/60 font-medium">{p.category}</span>
                 </div>
-                <span className="text-gold font-bold text-lg">{formatPrice(p.price)}</span>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+                <div className="flex items-end justify-between">
+                  <div>
+                    <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-gold transition-colors duration-300">{p.name}</h3>
+                    <p className="text-sm text-muted-foreground">{p.color} Leather</p>
+                  </div>
+                  <span className="text-gold font-bold text-lg">{formatPrice(p.price)}</span>
+                </div>
+              </Link>
+            </motion.div>
+          ))
+        )}
       </div>
 
       <motion.div
@@ -65,6 +125,7 @@ const FeaturedShoes = () => (
       </motion.div>
     </div>
   </section>
-);
+  );
+};
 
 export default FeaturedShoes;

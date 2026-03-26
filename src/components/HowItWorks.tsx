@@ -18,7 +18,7 @@ const HowItWorks = () => (
         className="text-center mb-20"
       >
         <span className="text-xs uppercase tracking-[0.4em] text-gold font-medium mb-4 block">Process</span>
-        <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">The CuzAura Experience</h2>
+        <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">The CusAura Experience</h2>
         <p className="text-muted-foreground max-w-lg mx-auto">From vision to creation — a seamless journey to your perfect pair.</p>
       </motion.div>
 

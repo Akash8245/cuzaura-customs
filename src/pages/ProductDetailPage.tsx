@@ -1,20 +1,75 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { products, formatPrice } from "@/lib/data";
+import { formatPrice } from "@/lib/data";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, Shield, RotateCcw, Truck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  color: string;
+  category: string;
+  description: string;
+  image_url?: string;
+  image?: string;
+  is_active: boolean;
+}
 
 const ProductDetailPage = () => {
   const { id } = useParams();
-  const product = products.find((p) => p.id === id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const addItem = useCartStore((s) => s.addItem);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) throw error;
+        setProduct(data);
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 flex items-center justify-center">
+        <p className="text-muted-foreground">Loading product...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center">
-        <p className="text-muted-foreground">Product not found.</p>
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Product not found.</p>
+          <Link to="/collection" className="text-gold hover:text-gold/80">
+            ← Back to Collection
+          </Link>
+        </div>
       </div>
     );
   }
@@ -36,7 +91,13 @@ const ProductDetailPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-secondary rounded-2xl p-12 aspect-square flex items-center justify-center sticky top-28"
           >
-            <img src={product.image} alt={product.name} width={800} height={800} className="w-full object-contain" />
+            {product.image_url || product.image ? (
+              <img src={product.image_url || product.image} alt={product.name} width={800} height={800} className="w-full object-contain" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-slate-800/50 rounded-xl">
+                <span className="text-gray-400 text-sm">No image available</span>
+              </div>
+            )}
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>

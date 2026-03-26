@@ -4,15 +4,19 @@ import shoe3 from "@/assets/shoe-3.png";
 import shoe4 from "@/assets/shoe-4.png";
 import shoe5 from "@/assets/shoe-5.png";
 import shoe6 from "@/assets/shoe-6.png";
+import { supabase } from "./supabase";
 
 export interface Product {
   id: string;
   name: string;
   price: number;
-  image: string;
+  image?: string;
+  image_url?: string;
   color: string;
   category: string;
   description: string;
+  image_size_bytes?: number;
+  created_at?: string;
 }
 
 export interface CartItem {
@@ -29,7 +33,8 @@ export interface ShoeCustomization {
   monogram?: string;
 }
 
-export const products: Product[] = [
+// Fallback products (in case database is not populated)
+export const defaultProducts: Product[] = [
   { id: "1", name: "Noir Derby", price: 14999, image: shoe1, color: "Black", category: "Derby", description: "Handcrafted from the finest Italian calfskin leather. The Noir Derby features a classic cap-toe design with Goodyear welt construction for unmatched durability and elegance." },
   { id: "2", name: "Cognac Brogue", price: 18999, image: shoe2, color: "Cognac", category: "Brogue", description: "A masterpiece of traditional British shoemaking. Full brogue wingtip detailing on rich cognac leather, hand-burnished for a museum-quality finish." },
   { id: "3", name: "Oxblood Monk", price: 21999, image: shoe3, color: "Burgundy", category: "Monk Strap", description: "Double monk strap in deep oxblood burgundy. Hand-polished brass buckles and a sleek silhouette make this a boardroom essential." },
@@ -37,6 +42,9 @@ export const products: Product[] = [
   { id: "5", name: "Midnight Loafer", price: 13999, image: shoe5, color: "Navy", category: "Loafer", description: "Effortless Italian sophistication. Deep midnight leather penny loafer with hand-stitched apron and butter-soft calfskin lining." },
   { id: "6", name: "Sahara Chukka", price: 15999, image: shoe6, color: "Tan", category: "Chukka Boot", description: "Desert-inspired elegance in premium suede. The Sahara Chukka features a two-eyelet design, leather sole, and a silhouette that bridges casual and formal." },
 ];
+
+// Use defaultProducts as fallback
+export const products = defaultProducts;
 
 export const baseModels = [
   { id: "oxford", name: "Oxford", image: shoe1 },
@@ -57,10 +65,10 @@ export const leatherColors = [
 ];
 
 export const testimonials = [
-  { name: "Arjun M.", role: "CEO, TechVenture", text: "CuzAura shoes are the finest I've ever owned. The craftsmanship is on par with Italian houses charging three times the price. Every stitch speaks quality.", rating: 5 },
-  { name: "Priya K.", role: "Fashion Editor", text: "In my 15 years reviewing luxury footwear, CuzAura stands out. The bespoke service is exceptional, and the leather quality is world-class.", rating: 5 },
+  { name: "Arjun M.", role: "CEO, TechVenture", text: "CusAura shoes are the finest I've ever owned. The craftsmanship is on par with Italian houses charging three times the price. Every stitch speaks quality.", rating: 5 },
+  { name: "Priya K.", role: "Fashion Editor", text: "In my 15 years reviewing luxury footwear, CusAura stands out. The bespoke service is exceptional, and the leather quality is world-class.", rating: 5 },
   { name: "Vikram S.", role: "Entrepreneur", text: "I've ordered four pairs now. Each one feels like it was made just for me. The attention to detail is something you won't find anywhere else at this price.", rating: 5 },
-  { name: "Rahul D.", role: "Senior Advocate", text: "From the courtroom to evening events, my CuzAura oxfords never fail to impress. The patina they develop over time is simply beautiful.", rating: 5 },
+  { name: "Rahul D.", role: "Senior Advocate", text: "From the courtroom to evening events, my CusAura oxfords never fail to impress. The patina they develop over time is simply beautiful.", rating: 5 },
 ];
 
 export const formatPrice = (price: number) => `₹${price.toLocaleString("en-IN")}`;

@@ -13,7 +13,7 @@ const Testimonials = () => (
       >
         <span className="text-xs uppercase tracking-[0.4em] text-gold font-medium mb-4 block">Testimonials</span>
         <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">Worn By The <span className="text-gradient">Discerning</span></h2>
-        <p className="text-muted-foreground max-w-lg mx-auto">Hear from those who've experienced the CuzAura difference.</p>
+        <p className="text-muted-foreground max-w-lg mx-auto">Hear from those who've experienced the CusAura difference.</p>
       </motion.div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
