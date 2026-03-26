@@ -11,6 +11,7 @@ export interface Product {
   price: number;
   image: string;
   color: string;
+  category: string;
   description: string;
 }
 
@@ -22,43 +23,44 @@ export interface CartItem {
 
 export interface ShoeCustomization {
   baseModel: string;
-  bodyColor: string;
+  leatherColor: string;
   soleColor: string;
   laceColor: string;
-  text?: string;
+  monogram?: string;
 }
 
 export const products: Product[] = [
-  { id: "1", name: "Aura Runner", price: 189, image: shoe1, color: "Blue", description: "Stealth meets speed. The Aura Runner features a breathable mesh upper with neon blue accents and a responsive cushion sole." },
-  { id: "2", name: "Violet Flux", price: 219, image: shoe2, color: "Purple", description: "Command attention with the Violet Flux. A bold purple gradient upper with cloud-like comfort and futuristic design." },
-  { id: "3", name: "Crimson Blaze", price: 199, image: shoe3, color: "Red", description: "Ignite your style with the Crimson Blaze. High-top silhouette with premium red leather and aggressive stance." },
-  { id: "4", name: "Neon Surge", price: 179, image: shoe4, color: "Green", description: "Electric energy in every step. The Neon Surge features transparent sole technology with vibrant green highlights." },
-  { id: "5", name: "Shadow Elite", price: 249, image: shoe5, color: "Black", description: "The ultimate stealth shoe. All-black premium leather with subtle gold details for those who lead from the shadows." },
-  { id: "6", name: "Rose Wave", price: 199, image: shoe6, color: "Pink", description: "Soft power meets bold design. The Rose Wave combines pink satin-finish uppers with a clean white platform sole." },
+  { id: "1", name: "Noir Derby", price: 14999, image: shoe1, color: "Black", category: "Derby", description: "Handcrafted from the finest Italian calfskin leather. The Noir Derby features a classic cap-toe design with Goodyear welt construction for unmatched durability and elegance." },
+  { id: "2", name: "Cognac Brogue", price: 18999, image: shoe2, color: "Cognac", category: "Brogue", description: "A masterpiece of traditional British shoemaking. Full brogue wingtip detailing on rich cognac leather, hand-burnished for a museum-quality finish." },
+  { id: "3", name: "Oxblood Monk", price: 21999, image: shoe3, color: "Burgundy", category: "Monk Strap", description: "Double monk strap in deep oxblood burgundy. Hand-polished brass buckles and a sleek silhouette make this a boardroom essential." },
+  { id: "4", name: "Chelsea Bordeaux", price: 16999, image: shoe4, color: "Brown", category: "Chelsea Boot", description: "The ultimate statement boot. Premium pull-up leather in dark bordeaux with elastic side panels and a refined slim profile." },
+  { id: "5", name: "Midnight Loafer", price: 13999, image: shoe5, color: "Navy", category: "Loafer", description: "Effortless Italian sophistication. Deep midnight leather penny loafer with hand-stitched apron and butter-soft calfskin lining." },
+  { id: "6", name: "Sahara Chukka", price: 15999, image: shoe6, color: "Tan", category: "Chukka Boot", description: "Desert-inspired elegance in premium suede. The Sahara Chukka features a two-eyelet design, leather sole, and a silhouette that bridges casual and formal." },
 ];
 
 export const baseModels = [
-  { id: "runner", name: "Runner", image: shoe1 },
-  { id: "high-top", name: "High Top", image: shoe3 },
-  { id: "platform", name: "Platform", image: shoe4 },
-  { id: "classic", name: "Classic", image: shoe5 },
+  { id: "oxford", name: "Oxford", image: shoe1 },
+  { id: "brogue", name: "Brogue", image: shoe2 },
+  { id: "monk", name: "Monk Strap", image: shoe3 },
+  { id: "chelsea", name: "Chelsea", image: shoe4 },
 ];
 
-export const colorOptions = [
-  { name: "Obsidian Black", value: "#1a1a2e" },
-  { name: "Neon Purple", value: "#8B5CF6" },
-  { name: "Electric Blue", value: "#3B82F6" },
-  { name: "Crimson Red", value: "#EF4444" },
-  { name: "Neon Green", value: "#22C55E" },
-  { name: "Hot Pink", value: "#EC4899" },
-  { name: "Pure White", value: "#F8FAFC" },
-  { name: "Sunset Orange", value: "#F97316" },
-  { name: "Gold", value: "#EAB308" },
-  { name: "Silver", value: "#94A3B8" },
+export const leatherColors = [
+  { name: "Jet Black", value: "#1a1a1a" },
+  { name: "Dark Brown", value: "#3B2314" },
+  { name: "Cognac", value: "#8B4513" },
+  { name: "Oxblood", value: "#4A0E0E" },
+  { name: "Tan", value: "#C68E5B" },
+  { name: "Midnight Navy", value: "#1B2638" },
+  { name: "Olive", value: "#3D3B2F" },
+  { name: "Ivory", value: "#F0E6D3" },
 ];
 
 export const testimonials = [
-  { name: "Alex M.", text: "CuzAura shoes are literally the only ones I get compliments on every single time. The customization is next level.", rating: 5 },
-  { name: "Jordan K.", text: "Finally a brand that gets Gen Z. The quality is insane and the design process was so fun.", rating: 5 },
-  { name: "Sam T.", text: "Wore my custom CuzAuras to a festival and everyone was asking where I got them. Absolute fire 🔥", rating: 5 },
+  { name: "Arjun M.", role: "CEO, TechVenture", text: "CuzAura shoes are the finest I've ever owned. The craftsmanship is on par with Italian houses charging three times the price. Every stitch speaks quality.", rating: 5 },
+  { name: "Priya K.", role: "Fashion Editor", text: "In my 15 years reviewing luxury footwear, CuzAura stands out. The bespoke service is exceptional, and the leather quality is world-class.", rating: 5 },
+  { name: "Vikram S.", role: "Entrepreneur", text: "I've ordered four pairs now. Each one feels like it was made just for me. The attention to detail is something you won't find anywhere else at this price.", rating: 5 },
+  { name: "Rahul D.", role: "Senior Advocate", text: "From the courtroom to evening events, my CuzAura oxfords never fail to impress. The patina they develop over time is simply beautiful.", rating: 5 },
 ];
+
+export const formatPrice = (price: number) => `₹${price.toLocaleString("en-IN")}`;

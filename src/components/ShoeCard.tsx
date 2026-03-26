@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Product } from "@/lib/data";
+import { Product, formatPrice } from "@/lib/data";
 
 const ShoeCard = ({ product, index = 0 }: { product: Product; index?: number }) => (
   <motion.div
@@ -17,16 +17,17 @@ const ShoeCard = ({ product, index = 0 }: { product: Product; index?: number }) 
           loading="lazy"
           width={800}
           height={800}
-          className="w-full h-full object-contain p-6 transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-contain p-8 transition-transform duration-700 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300" />
+        <div className="absolute inset-0 bg-gold/0 group-hover:bg-gold/[0.03] transition-colors duration-500" />
+        <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.2em] text-gold/50 font-medium">{product.category}</span>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         <div>
-          <h3 className="font-display font-semibold text-foreground">{product.name}</h3>
-          <p className="text-sm text-muted-foreground">{product.color}</p>
+          <h3 className="font-display font-semibold text-foreground group-hover:text-gold transition-colors duration-300">{product.name}</h3>
+          <p className="text-xs text-muted-foreground">{product.color} Leather</p>
         </div>
-        <span className="text-primary font-bold">${product.price}</span>
+        <span className="text-gold font-bold">{formatPrice(product.price)}</span>
       </div>
     </Link>
   </motion.div>

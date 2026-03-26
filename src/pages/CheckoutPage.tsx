@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle2 } from "lucide-react";
+import { formatPrice } from "@/lib/data";
 
 const CheckoutPage = () => {
   const { items, total, clearCart } = useCartStore();
@@ -25,7 +26,7 @@ const CheckoutPage = () => {
       clearCart();
       setStep("success");
       setProcessing(false);
-      toast({ title: "Order placed!", description: "Your shoes are being crafted." });
+      toast({ title: "Order placed!", description: "Your shoes are being handcrafted." });
     }, 2000);
   };
 
@@ -33,13 +34,11 @@ const CheckoutPage = () => {
     return (
       <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-6 text-center px-6">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
-          <CheckCircle2 className="w-24 h-24 text-primary mx-auto" />
+          <CheckCircle2 className="w-24 h-24 text-gold mx-auto" />
         </motion.div>
         <h1 className="font-display text-4xl font-bold">Order Confirmed!</h1>
-        <p className="text-muted-foreground max-w-md">
-          Your custom shoes are being crafted with love. We'll notify you when they ship.
-        </p>
-        <Button onClick={() => navigate("/")} variant="outline" className="mt-4">Back to Home</Button>
+        <p className="text-muted-foreground max-w-md">Your bespoke leather shoes are being handcrafted by our artisans. We'll notify you when they ship.</p>
+        <Button onClick={() => navigate("/")} variant="outline" className="mt-4 border-gold/20 hover:bg-gold/5 text-foreground">Back to Home</Button>
       </div>
     );
   }
@@ -49,15 +48,11 @@ const CheckoutPage = () => {
       <div className="container mx-auto px-6 max-w-2xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="font-display text-4xl font-bold mb-8">Checkout</h1>
-
-          {/* Steps indicator */}
           <div className="flex gap-4 mb-10">
             {["Address", "Payment"].map((s, i) => (
               <div key={s} className="flex items-center gap-2">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  (step === "address" && i === 0) || (step === "payment" && i <= 1)
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-muted-foreground"
+                  (step === "address" && i === 0) || (step === "payment" && i <= 1) ? "bg-gold text-primary-foreground" : "bg-secondary text-muted-foreground"
                 }`}>{i + 1}</div>
                 <span className="text-sm font-medium">{s}</span>
               </div>
@@ -70,15 +65,10 @@ const CheckoutPage = () => {
               <Input placeholder="Street Address" value={address.street} onChange={(e) => setAddress({ ...address, street: e.target.value })} className="bg-secondary border-border py-6" />
               <div className="grid grid-cols-2 gap-4">
                 <Input placeholder="City" value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} className="bg-secondary border-border py-6" />
-                <Input placeholder="ZIP Code" value={address.zip} onChange={(e) => setAddress({ ...address, zip: e.target.value })} className="bg-secondary border-border py-6" />
+                <Input placeholder="PIN Code" value={address.zip} onChange={(e) => setAddress({ ...address, zip: e.target.value })} className="bg-secondary border-border py-6" />
               </div>
               <Input placeholder="Phone" value={address.phone} onChange={(e) => setAddress({ ...address, phone: e.target.value })} className="bg-secondary border-border py-6" />
-              <Button
-                size="lg"
-                className="w-full glow-primary py-6 font-semibold mt-4"
-                onClick={() => setStep("payment")}
-                disabled={!address.name || !address.street || !address.city}
-              >
+              <Button size="lg" className="w-full glow-gold py-6 font-semibold mt-4" onClick={() => setStep("payment")} disabled={!address.name || !address.street || !address.city}>
                 Continue to Payment
               </Button>
             </motion.div>
@@ -91,12 +81,12 @@ const CheckoutPage = () => {
                 {items.map((item) => (
                   <div key={item.product.id} className="flex justify-between text-sm py-2 border-b border-border last:border-0">
                     <span>{item.product.name} × {item.quantity}</span>
-                    <span className="text-primary">${item.product.price * item.quantity}</span>
+                    <span className="text-gold">{formatPrice(item.product.price * item.quantity)}</span>
                   </div>
                 ))}
                 <div className="flex justify-between font-bold text-lg mt-4 pt-4 border-t border-border">
                   <span>Total</span>
-                  <span className="text-primary">${total()}</span>
+                  <span className="text-gradient">{formatPrice(total())}</span>
                 </div>
               </div>
               <div className="bg-secondary rounded-xl p-6">
@@ -107,13 +97,8 @@ const CheckoutPage = () => {
                   <Input placeholder="CVC" defaultValue="123" className="bg-muted border-border py-6" />
                 </div>
               </div>
-              <Button
-                size="lg"
-                className="w-full glow-primary py-6 font-semibold"
-                onClick={handlePayment}
-                disabled={processing}
-              >
-                {processing ? "Processing..." : `Pay $${total()}`}
+              <Button size="lg" className="w-full glow-gold py-6 font-semibold" onClick={handlePayment} disabled={processing}>
+                {processing ? "Processing..." : `Pay ${formatPrice(total())}`}
               </Button>
             </motion.div>
           )}

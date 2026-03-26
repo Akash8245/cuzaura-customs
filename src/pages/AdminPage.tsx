@@ -3,12 +3,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { formatPrice } from "@/lib/data";
 
 const fakeOrders = [
-  { id: "ORD-001", customer: "Alex M.", product: "Custom Runner", total: 259, status: "Pending", date: "2026-03-20" },
-  { id: "ORD-002", customer: "Jordan K.", product: "Violet Flux", total: 219, status: "Accepted", date: "2026-03-19" },
-  { id: "ORD-003", customer: "Sam T.", product: "Crimson Blaze", total: 199, status: "Shipped", date: "2026-03-18" },
-  { id: "ORD-004", customer: "Chris R.", product: "Shadow Elite", total: 249, status: "Delivered", date: "2026-03-15" },
+  { id: "ORD-001", customer: "Arjun M.", product: "Bespoke Oxford", total: 24999, status: "Pending", date: "2026-03-20" },
+  { id: "ORD-002", customer: "Priya K.", product: "Cognac Brogue", total: 18999, status: "Accepted", date: "2026-03-19" },
+  { id: "ORD-003", customer: "Vikram S.", product: "Oxblood Monk", total: 21999, status: "Shipped", date: "2026-03-18" },
+  { id: "ORD-004", customer: "Rahul D.", product: "Shadow Elite", total: 14999, status: "Delivered", date: "2026-03-15" },
 ];
 
 const statuses = ["Pending", "Accepted", "Shipped", "Delivered"];
@@ -42,7 +43,7 @@ const AdminPage = () => {
             <form onSubmit={handleLogin} className="space-y-4">
               <Input placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className="bg-muted border-border py-6" />
               <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="bg-muted border-border py-6" />
-              <Button type="submit" size="lg" className="w-full glow-primary py-6 font-semibold">Login</Button>
+              <Button type="submit" size="lg" className="w-full glow-gold py-6 font-semibold">Login</Button>
             </form>
           </div>
         </motion.div>
@@ -56,10 +57,9 @@ const AdminPage = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-8">
             <h1 className="font-display text-4xl font-bold">Admin Panel</h1>
-            <Button variant="outline" onClick={() => setLoggedIn(false)}>Logout</Button>
+            <Button variant="outline" onClick={() => setLoggedIn(false)} className="border-gold/20 hover:bg-gold/5 text-foreground">Logout</Button>
           </div>
-
-          <div className="bg-secondary rounded-xl overflow-hidden">
+          <div className="bg-secondary rounded-xl overflow-hidden glow-border">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -78,7 +78,7 @@ const AdminPage = () => {
                       <td className="p-4 font-medium text-foreground">{order.id}</td>
                       <td className="p-4 text-muted-foreground">{order.customer}</td>
                       <td className="p-4 text-muted-foreground">{order.product}</td>
-                      <td className="p-4 text-primary font-semibold">${order.total}</td>
+                      <td className="p-4 text-gold font-semibold">{formatPrice(order.total)}</td>
                       <td className="p-4 text-muted-foreground">{order.date}</td>
                       <td className="p-4">
                         <select
@@ -86,9 +86,7 @@ const AdminPage = () => {
                           onChange={(e) => updateStatus(order.id, e.target.value)}
                           className="bg-muted text-foreground border border-border rounded-lg px-3 py-1.5 text-sm"
                         >
-                          {statuses.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
+                          {statuses.map((s) => (<option key={s} value={s}>{s}</option>))}
                         </select>
                       </td>
                     </tr>
