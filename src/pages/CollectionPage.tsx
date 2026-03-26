@@ -5,10 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { Product } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
 
-const categories = ["All", "Derby", "Brogue", "Monk Strap", "Chelsea Boot", "Loafer", "Chukka Boot"];
-
 const CollectionPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +23,14 @@ const CollectionPage = () => {
 
         if (error) throw error;
         setProducts(data || []);
+
+        // Extract unique categories from products
+        if (data && data.length > 0) {
+          const uniqueCategories = Array.from(
+            new Set(data.map((p) => p.category).filter(Boolean))
+          ).sort() as string[];
+          setCategories(["All", ...uniqueCategories]);
+        }
       } catch (err: any) {
         toast({
           title: "Error",

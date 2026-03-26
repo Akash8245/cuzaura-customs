@@ -71,6 +71,8 @@ const AdminPage = () => {
   // Orders state
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
   const statuses = ["Pending", "Accepted", "Shipped", "Delivered", "Returned"];
 
   // Check for stored session
@@ -676,59 +678,198 @@ const AdminPage = () => {
                   <p className="text-gray-400">No orders yet</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <motion.div
-                      key={order.id}
-                      className="bg-slate-800/50 border border-amber-500/30 rounded-xl p-6"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                          <p className="text-gray-400 text-xs uppercase">Order ID</p>
-                          <p className="text-white font-mono text-sm mt-1">
-                            {order.id.slice(0, 12)}...
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs uppercase">Customer</p>
-                          <p className="text-white text-sm mt-1">
-                            {order.shipping_email}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs uppercase">Total</p>
-                          <p className="text-amber-400 font-bold mt-1">₹{order.total}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs uppercase">Status</p>
-                          <select
-                            value={order.status}
-                            onChange={(e) =>
-                              handleUpdateOrderStatus(order.id, e.target.value)
-                            }
-                            className="mt-1 bg-slate-700 border border-amber-500/30 text-white rounded px-3 py-1 text-sm w-full"
-                          >
-                            {statuses.map((s) => (
-                              <option key={s} value={s}>
-                                {s}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
+                <div className="space-y-6">
+                  {/* Status Filter Tabs */}
+                  <div className="flex gap-2 border-b border-amber-500/20 pb-4 overflow-x-auto">
+                    {["all", ...statuses].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setOrderStatusFilter(tab)}
+                        className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
+                          orderStatusFilter === tab
+                            ? "bg-amber-500/20 border border-amber-500/60 text-amber-400"
+                            : "bg-slate-700/40 border border-slate-600/40 text-gray-400 hover:text-gray-300"
+                        }`}
+                      >
+                        {tab === "all" ? "All Orders" : tab}
+                        <span className="ml-2 text-xs font-normal">
+                          ({orders.filter(o => tab === "all" || o.status === tab).length})
+                        </span>
+                      </button>
+                    ))}
+                  </div>
 
-                      {order.order_items?.length > 0 && (
-                        <div className="pt-4 border-t border-amber-500/20">
-                          <p className="text-gray-400 text-xs uppercase mb-2">Items</p>
-                          {order.order_items.map((item: any, idx: number) => (
-                            <p key={idx} className="text-white text-sm">
-                              • {item.product_name} (x{item.quantity}) - ₹{item.price}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
+                  {/* Orders List */}
+                  <div className="space-y-3">
+                    {orders
+                      .filter(o => orderStatusFilter === "all" || o.status === orderStatusFilter)
+                      .map((order) => (
+                        <motion.div
+                          key={order.id}
+                          className="cursor-pointer transition-all"
+                          onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}
+                        >
+                          {/* Compact Order Card */}
+                          <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-amber-500/30 rounded-xl p-5 hover:border-amber-500/60 hover:from-slate-800 hover:to-slate-800 transition-all">
+                            <div className="flex justify-between items-center">
+                              <div className="flex-1">
+                                <p className="text-white font-semibold text-sm">Order {order.id.slice(0, 8)}</p>
+                                <p className="text-gray-400 text-xs mt-1">
+                                  {new Date(order.created_at).toLocaleDateString()} • {order.shipping_name || "No name"}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-6">
+                                <div className="text-right">
+                                  <p className="text-amber-400 font-bold">₹{order.total}</p>
+                                  <span
+                                    className={`text-xs font-semibold mt-1 inline-block px-3 py-1 rounded-full ${
+                                      order.status === "Accepted"
+                                        ? "bg-green-500/20 text-green-400"
+                                        : order.status === "Pending"
+                                        ? "bg-yellow-500/20 text-yellow-400"
+                                        : "bg-blue-500/20 text-blue-400"
+                                    }`}
+                                  >
+                                    {order.status}
+                                  </span>
+                                </div>
+                                <div className="text-gray-400">
+                                  <svg
+                                    className={`w-5 h-5 transition-transform ${
+                                      expandedOrderId === order.id ? "rotate-180" : ""
+                                    }`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Expanded Details */}
+                          {expandedOrderId === order.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="mt-2 bg-slate-800/80 border border-amber-500/20 rounded-xl p-6 space-y-6"
+                            >
+                              {/* Customer Information */}
+                              <div>
+                                <h4 className="text-amber-400 font-bold text-sm uppercase tracking-wider mb-3">
+                                  Customer Information
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <p className="text-gray-400 text-xs uppercase">Name</p>
+                                    <p className="text-white font-semibold mt-1">
+                                      {order.shipping_name || "N/A"}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 text-xs uppercase">Email</p>
+                                    <p className="text-white break-all">
+                                      {order.shipping_email || "N/A"}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 text-xs uppercase">Phone</p>
+                                    <p className="text-white font-mono">
+                                      {order.shipping_phone || "N/A"}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Shipping Address */}
+                              <div>
+                                <h4 className="text-amber-400 font-bold text-sm uppercase tracking-wider mb-3">
+                                  Shipping Address
+                                </h4>
+                                <div className="bg-slate-700/30 rounded-lg p-4 text-sm text-white space-y-1">
+                                  <p className="font-semibold">{order.shipping_address || "N/A"}</p>
+                                  <p>
+                                    {[
+                                      order.shipping_city,
+                                      order.shipping_state,
+                                      order.shipping_postal_code,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(", ") || "N/A"}
+                                  </p>
+                                  <p>{order.shipping_country || "N/A"}</p>
+                                </div>
+                              </div>
+
+                              {/* Order Items */}
+                              {order.order_items?.length > 0 && (
+                                <div>
+                                  <h4 className="text-amber-400 font-bold text-sm uppercase tracking-wider mb-3">
+                                    Order Items
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {order.order_items.map((item: any, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        className="bg-slate-700/20 rounded-lg p-3 border border-slate-600/30 text-sm"
+                                      >
+                                        <div className="flex justify-between items-start gap-4">
+                                          <div className="flex-1">
+                                            <p className="text-white font-semibold">
+                                              {item.product_name}
+                                            </p>
+                                            <div className="flex flex-wrap gap-4 text-xs text-gray-400 mt-1">
+                                              {item.product_color && (
+                                                <span>Color: {item.product_color}</span>
+                                              )}
+                                              {item.product_category && (
+                                                <span>Category: {item.product_category}</span>
+                                              )}
+                                              <span>Qty: {item.quantity}</span>
+                                            </div>
+                                          </div>
+                                          <p className="text-amber-400 font-bold whitespace-nowrap">
+                                            ₹{item.price}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Status Update */}
+                              <div>
+                                <h4 className="text-amber-400 font-bold text-sm uppercase tracking-wider mb-3">
+                                  Update Status
+                                </h4>
+                                <select
+                                  value={order.status}
+                                  onChange={(e) =>
+                                    handleUpdateOrderStatus(order.id, e.target.value)
+                                  }
+                                  className="w-full bg-slate-700/80 border border-amber-500/40 text-white rounded-lg px-4 py-2 text-sm font-medium hover:border-amber-500/60 transition-colors"
+                                >
+                                  {statuses.map((s) => (
+                                    <option key={s} value={s}>
+                                      {s}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      ))}
+                  </div>
                 </div>
               )}
             </TabsContent>

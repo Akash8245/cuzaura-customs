@@ -4,6 +4,14 @@ import { formatPrice } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 import { Loader } from "lucide-react";
+import shoe1 from "@/assets/shoe-1.png";
+import shoe2 from "@/assets/shoe-2.png";
+import shoe3 from "@/assets/shoe-3.png";
+import shoe4 from "@/assets/shoe-4.png";
+import shoe5 from "@/assets/shoe-5.png";
+import shoe6 from "@/assets/shoe-6.png";
+
+const DEFAULT_SHOE_IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];
 
 interface Product {
   id: string;
@@ -15,6 +23,27 @@ interface Product {
   description: string;
   is_active: boolean;
 }
+
+const FeaturedShoeImage = ({ product, fallbackImage }: { product: Product; fallbackImage: string }) => {
+  const [imageSrc, setImageSrc] = useState(product.image_url || fallbackImage);
+
+  const handleImageError = () => {
+    console.warn(`Featured image failed to load for ${product.name}:`, product.image_url);
+    setImageSrc(fallbackImage);
+  };
+
+  return (
+    <img
+      src={imageSrc}
+      onError={handleImageError}
+      alt={product.name}
+      loading="lazy"
+      width={800}
+      height={800}
+      className="w-full h-full object-contain p-10 transition-transform duration-700 group-hover:scale-105"
+    />
+  );
+};
 
 const FeaturedShoes = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -70,7 +99,13 @@ const FeaturedShoes = () => {
             <p className="text-muted-foreground">No products available yet.</p>
           </div>
         ) : (
-          products.map((p, i) => (
+          products.map((p, i) => {
+            const fallbackImage = DEFAULT_SHOE_IMAGES[
+              (p.id.charCodeAt(0) + p.id.charCodeAt(p.id.length - 1)) % 
+              DEFAULT_SHOE_IMAGES.length
+            ];
+
+            return (
             <motion.div
               key={p.id}
               initial={{ opacity: 0, y: 40 }}
@@ -80,20 +115,7 @@ const FeaturedShoes = () => {
             >
               <Link to={`/collection/${p.id}`} className="group block">
                 <div className="relative bg-secondary rounded-xl overflow-hidden aspect-square mb-5">
-                  {p.image_url ? (
-                    <img
-                      src={p.image_url}
-                      alt={p.name}
-                      loading="lazy"
-                      width={800}
-                      height={800}
-                      className="w-full h-full object-contain p-10 transition-transform duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-slate-800/50">
-                      <span className="text-gray-400 text-sm">No image</span>
-                    </div>
-                  )}
+                  <FeaturedShoeImage product={p} fallbackImage={fallbackImage} />
                   <div className="absolute inset-0 bg-gold/0 group-hover:bg-gold/[0.03] transition-colors duration-500" />
                   <span className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.2em] text-gold/60 font-medium">{p.category}</span>
                 </div>
@@ -106,7 +128,8 @@ const FeaturedShoes = () => {
                 </div>
               </Link>
             </motion.div>
-          ))
+            );
+          })
         )}
       </div>
 

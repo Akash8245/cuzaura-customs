@@ -4,6 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatPrice } from "@/lib/data";
+import shoe1 from "@/assets/shoe-1.png";
+import shoe2 from "@/assets/shoe-2.png";
+import shoe3 from "@/assets/shoe-3.png";
+import shoe4 from "@/assets/shoe-4.png";
+import shoe5 from "@/assets/shoe-5.png";
+import shoe6 from "@/assets/shoe-6.png";
+import { useState } from "react";
+
+const DEFAULT_SHOE_IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];
+
+const CartItemImage = ({ item, fallbackImage }: { item: any; fallbackImage: string }) => {
+  const [imageSrc, setImageSrc] = useState(item.product.image_url || item.product.image || fallbackImage);
+
+  const handleImageError = () => {
+    console.warn(`Cart image failed to load:`, item.product.image_url);
+    setImageSrc(fallbackImage);
+  };
+
+  return (
+    <img
+      src={imageSrc}
+      onError={handleImageError}
+      alt={item.product.name}
+      className="w-24 h-24 object-contain"
+      loading="lazy"
+      width={96}
+      height={96}
+    />
+  );
+};
 
 const CartPage = () => {
   const { items, removeItem, updateQuantity, total } = useCartStore();
@@ -29,7 +59,13 @@ const CartPage = () => {
 
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item, i) => (
+            {items.map((item, i) => {
+              const fallbackImage = DEFAULT_SHOE_IMAGES[
+                (item.product.id.charCodeAt(0) + item.product.id.charCodeAt(item.product.id.length - 1)) % 
+                DEFAULT_SHOE_IMAGES.length
+              ];
+
+              return (
               <motion.div
                 key={item.product.id + i}
                 initial={{ opacity: 0, y: 20 }}
@@ -37,7 +73,7 @@ const CartPage = () => {
                 transition={{ delay: i * 0.1 }}
                 className="bg-secondary rounded-xl p-6 flex gap-6 items-center"
               >
-                <img src={item.product.image} alt={item.product.name} className="w-24 h-24 object-contain" loading="lazy" width={96} height={96} />
+                <CartItemImage item={item} fallbackImage={fallbackImage} />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-display font-semibold text-foreground">{item.product.name}</h3>
                   <p className="text-sm text-muted-foreground">{item.customization ? "Bespoke Design" : item.product.color + " Leather"}</p>
@@ -50,7 +86,8 @@ const CartPage = () => {
                 </div>
                 <button onClick={() => removeItem(item.product.id)} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={18} /></button>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-secondary rounded-xl p-8 h-fit glow-border">

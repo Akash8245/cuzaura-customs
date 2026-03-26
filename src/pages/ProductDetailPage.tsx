@@ -7,6 +7,14 @@ import { ShoppingBag, ArrowLeft, Shield, RotateCcw, Truck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import shoe1 from "@/assets/shoe-1.png";
+import shoe2 from "@/assets/shoe-2.png";
+import shoe3 from "@/assets/shoe-3.png";
+import shoe4 from "@/assets/shoe-4.png";
+import shoe5 from "@/assets/shoe-5.png";
+import shoe6 from "@/assets/shoe-6.png";
+
+const DEFAULT_SHOE_IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];
 
 interface Product {
   id: string;
@@ -24,6 +32,7 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageSrc, setImageSrc] = useState("");
   const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
@@ -42,6 +51,11 @@ const ProductDetailPage = () => {
 
         if (error) throw error;
         setProduct(data);
+        const fallbackImage = DEFAULT_SHOE_IMAGES[
+          (data.id.charCodeAt(0) + data.id.charCodeAt(data.id.length - 1)) % 
+          DEFAULT_SHOE_IMAGES.length
+        ];
+        setImageSrc(data.image_url || data.image || fallbackImage);
       } catch (err) {
         console.error("Failed to fetch product:", err);
         setProduct(null);
@@ -52,6 +66,17 @@ const ProductDetailPage = () => {
 
     fetchProduct();
   }, [id]);
+
+  const handleImageError = () => {
+    if (product) {
+      const fallbackImage = DEFAULT_SHOE_IMAGES[
+        (product.id.charCodeAt(0) + product.id.charCodeAt(product.id.length - 1)) % 
+        DEFAULT_SHOE_IMAGES.length
+      ];
+      console.warn(`Image failed to load:`, product.image_url);
+      setImageSrc(fallbackImage);
+    }
+  };
 
   if (loading) {
     return (
@@ -74,6 +99,14 @@ const ProductDetailPage = () => {
     );
   }
 
+  const getImageSrc = () => {
+    if (!product) return DEFAULT_SHOE_IMAGES[0];
+    return product.image_url || product.image || DEFAULT_SHOE_IMAGES[
+      (product.id.charCodeAt(0) + product.id.charCodeAt(product.id.length - 1)) % 
+      DEFAULT_SHOE_IMAGES.length
+    ];
+  };
+
   const handleAdd = () => {
     addItem(product);
     toast({ title: "Added to cart", description: `${product.name} has been added.` });
@@ -91,13 +124,14 @@ const ProductDetailPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-secondary rounded-2xl p-12 aspect-square flex items-center justify-center sticky top-28"
           >
-            {product.image_url || product.image ? (
-              <img src={product.image_url || product.image} alt={product.name} width={800} height={800} className="w-full object-contain" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-slate-800/50 rounded-xl">
-                <span className="text-gray-400 text-sm">No image available</span>
-              </div>
-            )}
+            <img
+              src={imageSrc || getImageSrc()}
+              onError={handleImageError}
+              alt={product.name}
+              width={800}
+              height={800}
+              className="w-full object-contain"
+            />
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
