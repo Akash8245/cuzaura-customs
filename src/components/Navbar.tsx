@@ -7,7 +7,7 @@ import { useCartStore } from "@/store/cartStore";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/collection", label: "Collection" },
-  { to: "/customize", label: "Customize" },
+  { to: "/customize", label: "Bespoke" },
 ];
 
 const Navbar = () => {
@@ -29,7 +29,7 @@ const Navbar = () => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled ? "glass" : "bg-transparent"
       }`}
     >
@@ -38,14 +38,13 @@ const Navbar = () => {
           Cuz<span className="text-gradient">Aura</span>
         </Link>
 
-        {/* Desktop */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`text-sm font-medium transition-colors duration-200 hover:text-primary ${
-                location.pathname === link.to ? "text-primary" : "text-muted-foreground"
+              className={`text-sm font-medium transition-colors duration-300 hover:text-gold ${
+                location.pathname === link.to ? "text-gold" : "text-muted-foreground"
               }`}
             >
               {link.label}
@@ -53,47 +52,39 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
-          <Link to="/login" className="text-muted-foreground hover:text-foreground transition-colors">
+        <div className="flex items-center gap-5">
+          <Link to="/login" className="text-muted-foreground hover:text-gold transition-colors duration-300">
             <User size={20} />
           </Link>
-          <Link to="/cart" className="relative text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/cart" className="relative text-muted-foreground hover:text-gold transition-colors duration-300">
             <ShoppingBag size={20} />
             {itemCount > 0 && (
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold"
+                className="absolute -top-2 -right-2 w-5 h-5 bg-gold text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold"
               >
                 {itemCount}
               </motion.span>
             )}
           </Link>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-foreground"
-          >
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-foreground">
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-border"
+            className="md:hidden glass border-t border-gold/10"
           >
             <div className="container mx-auto px-6 py-4 flex flex-col gap-4">
               {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className="text-foreground font-medium py-2"
-                >
+                <Link key={link.to} to={link.to} className="text-foreground font-medium py-2">
                   {link.label}
                 </Link>
               ))}
