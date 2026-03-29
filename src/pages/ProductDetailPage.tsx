@@ -1,9 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { formatPrice } from "@/lib/data";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowLeft, Shield, RotateCcw, Truck } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Shield, RotateCcw, Truck, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +25,7 @@ interface Product {
   description: string;
   image_url?: string;
   image?: string;
+  additional_images?: string;
   is_active: boolean;
 }
 
@@ -32,30 +33,41 @@ const ProductDetailPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imageSrc, setImageSrc] = useState("");
+  const [allImages, setAllImages] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
+
+  const getFallbackImage = (productId: string) => {
+    return DEFAULT_SHOE_IMAGES[
+      (productId.charCodeAt(0) + productId.charCodeAt(productId.length - 1)) % DEFAULT_SHOE_IMAGES.length
+    ];
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!id) {
-        setLoading(false);
-        return;
-      }
-
+      if (!id) { setLoading(false); return; }
       try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .eq("id", id)
-          .single();
-
+        const { data, error } = await supabase.from("products").select("*").eq("id", id).single();
         if (error) throw error;
         setProduct(data);
-        const fallbackImage = DEFAULT_SHOE_IMAGES[
-          (data.id.charCodeAt(0) + data.id.charCodeAt(data.id.length - 1)) % 
-          DEFAULT_SHOE_IMAGES.length
-        ];
-        setImageSrc(data.image_url || data.image || fallbackImage);
+
+        // Build image array
+        const images: string[] = [];
+        const mainImage = data.image_url || data.image || getFallbackImage(data.id);
+        images.push(mainImage);
+
+        // Parse additional images
+        if (data.additional_images) {
+          try {
+            const additional = JSON.parse(data.additional_images);
+            if (Array.isArray(additional)) {
+              images.push(...additional);
+            }
+          } catch {}
+        }
+
+        setAllImages(images);
+        setSelectedImageIndex(0);
       } catch (err) {
         console.error("Failed to fetch product:", err);
         setProduct(null);
@@ -63,25 +75,31 @@ const ProductDetailPage = () => {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
-  const handleImageError = () => {
+  const handleImageError = (index: number) => {
     if (product) {
-      const fallbackImage = DEFAULT_SHOE_IMAGES[
-        (product.id.charCodeAt(0) + product.id.charCodeAt(product.id.length - 1)) % 
-        DEFAULT_SHOE_IMAGES.length
-      ];
-      console.warn(`Image failed to load:`, product.image_url);
-      setImageSrc(fallbackImage);
+      setAllImages(prev => {
+        const updated = [...prev];
+        updated[index] = getFallbackImage(product.id);
+        return updated;
+      });
     }
+  };
+
+  const nextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen pt-24 flex items-center justify-center">
-        <p className="text-muted-foreground">Loading product...</p>
+        <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -91,21 +109,11 @@ const ProductDetailPage = () => {
       <div className="min-h-screen pt-24 flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">Product not found.</p>
-          <Link to="/collection" className="text-gold hover:text-gold/80">
-            ← Back to Collection
-          </Link>
+          <Link to="/collection" className="text-gold hover:text-gold/80">← Back to Collection</Link>
         </div>
       </div>
     );
   }
-
-  const getImageSrc = () => {
-    if (!product) return DEFAULT_SHOE_IMAGES[0];
-    return product.image_url || product.image || DEFAULT_SHOE_IMAGES[
-      (product.id.charCodeAt(0) + product.id.charCodeAt(product.id.length - 1)) % 
-      DEFAULT_SHOE_IMAGES.length
-    ];
-  };
 
   const handleAdd = () => {
     addItem(product);
@@ -119,21 +127,73 @@ const ProductDetailPage = () => {
           <ArrowLeft size={14} /> Back to Collection
         </Link>
         <div className="grid md:grid-cols-2 gap-16 items-start">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-secondary rounded-2xl p-12 aspect-square flex items-center justify-center sticky top-28"
-          >
-            <img
-              src={imageSrc || getImageSrc()}
-              onError={handleImageError}
-              alt={product.name}
-              width={800}
-              height={800}
-              className="w-full object-contain"
-            />
+          {/* Image Gallery */}
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="sticky top-28">
+            {/* Main Image */}
+            <div className="relative bg-secondary rounded-2xl overflow-hidden aspect-square flex items-center justify-center mb-4">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedImageIndex}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  src={allImages[selectedImageIndex]}
+                  onError={() => handleImageError(selectedImageIndex)}
+                  alt={`${product.name} - Image ${selectedImageIndex + 1}`}
+                  className="w-full h-full object-contain p-8"
+                />
+              </AnimatePresence>
+
+              {/* Navigation arrows */}
+              {allImages.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                  {/* Image counter */}
+                  <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+                    {selectedImageIndex + 1} / {allImages.length}
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail strip */}
+            {allImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {allImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      idx === selectedImageIndex
+                        ? "border-gold ring-2 ring-gold/30"
+                        : "border-border/30 hover:border-gold/50 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      onError={() => handleImageError(idx)}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-contain p-1 bg-secondary"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
+          {/* Product Info */}
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <span className="text-xs uppercase tracking-[0.3em] text-gold font-medium mb-2 block">{product.category}</span>
             <h1 className="font-display text-4xl md:text-5xl font-bold mb-2">{product.name}</h1>
