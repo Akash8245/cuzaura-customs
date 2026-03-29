@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { formatPrice } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Loader } from "lucide-react";
 import shoe1 from "@/assets/shoe-1.png";
 import shoe2 from "@/assets/shoe-2.png";
@@ -24,7 +24,7 @@ interface Product {
   is_active: boolean;
 }
 
-const FeaturedShoeImage = ({ product, fallbackImage }: { product: Product; fallbackImage: string }) => {
+const FeaturedShoeImage = memo(({ product, fallbackImage }: { product: Product; fallbackImage: string }) => {
   const [imageSrc, setImageSrc] = useState(product.image_url || fallbackImage);
 
   const handleImageError = () => {
@@ -38,12 +38,14 @@ const FeaturedShoeImage = ({ product, fallbackImage }: { product: Product; fallb
       onError={handleImageError}
       alt={product.name}
       loading="lazy"
-      width={800}
-      height={800}
-      className="w-full h-full object-contain p-10 transition-transform duration-700 group-hover:scale-105"
+      decoding="async"
+      width={400}
+      height={400}
+      className="w-full h-full object-contain p-10 transition-transform duration-500 group-hover:scale-105 will-change-transform"
     />
   );
-};
+});
+FeaturedShoeImage.displayName = "FeaturedShoeImage";
 
 const FeaturedShoes = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -111,7 +113,7 @@ const FeaturedShoes = () => {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15, duration: 0.6 }}
+              transition={{ delay: Math.min(i * 0.1, 0.2), duration: 0.4 }}
             >
               <Link to={`/collection/${p.id}`} className="group block">
                 <div className="relative bg-secondary rounded-xl overflow-hidden aspect-square mb-5">

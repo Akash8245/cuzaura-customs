@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Ruler, Palette, Package, Sparkles } from "lucide-react";
+import { memo } from "react";
 
 const steps = [
   { icon: Ruler, title: "Select", desc: "Choose your base silhouette from our curated range of timeless designs — Oxford, Derby, Monk Strap, or Chelsea." },
@@ -8,13 +9,14 @@ const steps = [
   { icon: Package, title: "Deliver", desc: "Your bespoke pair arrives in our signature packaging, ready to make a lasting impression." },
 ];
 
-const HowItWorks = () => (
+const HowItWorks = memo(() => (
   <section className="py-28">
     <div className="container mx-auto px-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
+        transition={{ duration: 0.4 }}
         className="text-center mb-20"
       >
         <span className="text-xs uppercase tracking-[0.4em] text-gold font-medium mb-4 block">Process</span>
@@ -29,7 +31,7 @@ const HowItWorks = () => (
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.15 }}
+            transition={{ delay: Math.min(i * 0.1, 0.2), duration: 0.4 }}
             className="text-center group"
           >
             <div className="relative mb-6">
@@ -47,6 +49,7 @@ const HowItWorks = () => (
       </div>
     </div>
   </section>
-);
+));
 
+HowItWorks.displayName = "HowItWorks";
 export default HowItWorks;

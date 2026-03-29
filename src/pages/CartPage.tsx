@@ -10,17 +10,16 @@ import shoe3 from "@/assets/shoe-3.png";
 import shoe4 from "@/assets/shoe-4.png";
 import shoe5 from "@/assets/shoe-5.png";
 import shoe6 from "@/assets/shoe-6.png";
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 
 const DEFAULT_SHOE_IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];
 
-const CartItemImage = ({ item, fallbackImage }: { item: any; fallbackImage: string }) => {
+const CartItemImage = memo(({ item, fallbackImage }: { item: any; fallbackImage: string }) => {
   const [imageSrc, setImageSrc] = useState(item.product.image_url || item.product.image || fallbackImage);
 
-  const handleImageError = () => {
-    console.warn(`Cart image failed to load:`, item.product.image_url);
+  const handleImageError = useCallback(() => {
     setImageSrc(fallbackImage);
-  };
+  }, [fallbackImage]);
 
   return (
     <img
@@ -29,14 +28,20 @@ const CartItemImage = ({ item, fallbackImage }: { item: any; fallbackImage: stri
       alt={item.product.name}
       className="w-24 h-24 object-contain"
       loading="lazy"
+      decoding="async"
       width={96}
       height={96}
     />
   );
-};
+}, (prev, next) => prev.item.product.id === next.item.product.id && prev.fallbackImage === next.fallbackImage);
+CartItemImage.displayName = "CartItemImage";
 
 const CartPage = () => {
-  const { items, removeItem, updateQuantity, total } = useCartStore();
+  const items = useCartStore((s) => s.items);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const updateQuantity = useCartStore((s) => s.updateQuantity);
+  
+  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
   if (items.length === 0) {
     return (
@@ -93,9 +98,9 @@ const CartPage = () => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="bg-secondary rounded-xl p-8 h-fit glow-border">
             <h3 className="font-display text-xl font-bold mb-6">Order Summary</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatPrice(total())}</span></div>
+              <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>{formatPrice(total)}</span></div>
               <div className="flex justify-between text-muted-foreground"><span>Shipping</span><span className="text-gold">Free</span></div>
-              <div className="border-t border-border pt-3 flex justify-between text-lg font-bold"><span>Total</span><span className="text-gradient">{formatPrice(total())}</span></div>
+              <div className="border-t border-border pt-3 flex justify-between text-lg font-bold"><span>Total</span><span className="text-gradient">{formatPrice(total)}</span></div>
             </div>
             <Button asChild size="lg" className="w-full mt-6 glow-gold py-6 font-semibold">
               <Link to="/checkout">Proceed to Checkout</Link>

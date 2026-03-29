@@ -7,10 +7,9 @@ interface CartStore {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  total: () => number;
-  itemCount: () => number;
 }
 
+// Create memoized selectors to avoid unnecessary re-renders
 export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
   addItem: (product, customization) =>
@@ -34,6 +33,9 @@ export const useCartStore = create<CartStore>((set, get) => ({
         : state.items.map((i) => (i.product.id === productId ? { ...i, quantity } : i)),
     })),
   clearCart: () => set({ items: [] }),
-  total: () => get().items.reduce((sum, i) => sum + i.product.price * i.quantity, 0),
-  itemCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 }));
+
+// Memoized selectors to prevent unnecessary renders
+export const useCartTotal = () => useCartStore((state) => state.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0));
+export const useCartItemCount = () => useCartStore((state) => state.items.reduce((sum, i) => sum + i.quantity, 0));
+export const useCartItems = () => useCartStore((state) => state.items);

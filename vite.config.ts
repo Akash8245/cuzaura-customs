@@ -19,4 +19,31 @@ export default defineConfig(({ mode }) => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Vendor chunk
+          if (id.includes("node_modules")) {
+            if (id.includes("@radix-ui")) return "radix-ui";
+            if (id.includes("framer-motion")) return "framer-motion";
+            if (id.includes("react")) return "react-vendor";
+            if (id.includes("supabase")) return "supabase";
+            return "vendor";
+          }
+        },
+      },
+    },
+    sourcemap: false,
+  },
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "zustand",
+      "@supabase/supabase-js",
+      "framer-motion",
+    ],
+  },
 }));

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import ShoeCard from "@/components/ShoeCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { Product } from "@/lib/data";
 import { toast } from "@/hooks/use-toast";
@@ -46,7 +46,14 @@ const CollectionPage = () => {
     fetchProducts();
   }, []);
 
-  const filtered = filter === "All" ? products : products.filter((p) => p.category === filter);
+  const filtered = useMemo(() => 
+    filter === "All" ? products : products.filter((p) => p.category === filter),
+    [filter, products]
+  );
+
+  const handleFilterChange = useCallback((category: string) => {
+    setFilter(category);
+  }, []);
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -58,7 +65,7 @@ const CollectionPage = () => {
             {categories.map((c) => (
               <button
                 key={c}
-                onClick={() => setFilter(c)}
+                onClick={() => handleFilterChange(c)}
                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                   filter === c
                     ? "bg-gold text-primary-foreground"

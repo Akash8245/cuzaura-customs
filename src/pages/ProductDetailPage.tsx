@@ -5,7 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, Shield, RotateCcw, Truck, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import shoe1 from "@/assets/shoe-1.png";
 import shoe2 from "@/assets/shoe-2.png";
@@ -37,11 +37,11 @@ const ProductDetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const addItem = useCartStore((s) => s.addItem);
 
-  const getFallbackImage = (productId: string) => {
+  const getFallbackImage = useCallback((productId: string) => {
     return DEFAULT_SHOE_IMAGES[
       (productId.charCodeAt(0) + productId.charCodeAt(productId.length - 1)) % DEFAULT_SHOE_IMAGES.length
     ];
-  };
+  }, []);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -76,9 +76,9 @@ const ProductDetailPage = () => {
       }
     };
     fetchProduct();
-  }, [id]);
+  }, [id, getFallbackImage]);
 
-  const handleImageError = (index: number) => {
+  const handleImageError = useCallback((index: number) => {
     if (product) {
       setAllImages(prev => {
         const updated = [...prev];
@@ -86,15 +86,15 @@ const ProductDetailPage = () => {
         return updated;
       });
     }
-  };
+  }, [product, getFallbackImage]);
 
-  const nextImage = () => {
+  const nextImage = useCallback(() => {
     setSelectedImageIndex((prev) => (prev + 1) % allImages.length);
-  };
+  }, [allImages.length]);
 
-  const prevImage = () => {
+  const prevImage = useCallback(() => {
     setSelectedImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
-  };
+  }, [allImages.length]);
 
   if (loading) {
     return (

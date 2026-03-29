@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import heroShoe from "@/assets/hero-shoe.png";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { memo } from "react";
 
-const Hero = () => (
+const Hero = memo(() => (
   <section className="relative min-h-screen flex items-center overflow-hidden gradient-mesh">
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full bg-gold/[0.03] blur-[100px]" />
@@ -16,13 +17,13 @@ const Hero = () => (
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           className="text-center md:text-left"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
             className="inline-block mb-6"
           >
             <span className="text-xs uppercase tracking-[0.4em] text-gold/70 font-medium border border-gold/20 rounded-full px-5 py-2">
@@ -54,7 +55,7 @@ const Hero = () => (
         <motion.div
           initial={{ opacity: 0, scale: 0.85, rotate: -5 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
           className="flex justify-center relative"
         >
           <div className="absolute inset-0 flex items-center justify-center">
@@ -63,11 +64,13 @@ const Hero = () => (
           <motion.img
             src={heroShoe}
             alt="CusAura handcrafted leather shoe"
-            width={1024}
-            height={1024}
+            width={512}
+            height={512}
+            decoding="async"
+            loading="eager"
             className="w-full max-w-lg drop-shadow-2xl relative z-10"
-            animate={{ y: [0, -15, 0], rotate: [-2, 0, -2] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
       </div>
@@ -76,6 +79,7 @@ const Hero = () => (
     {/* Bottom line */}
     <div className="absolute bottom-0 left-0 right-0 line-gold" />
   </section>
-);
+));
 
+Hero.displayName = "Hero";
 export default Hero;

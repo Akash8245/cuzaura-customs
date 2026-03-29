@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Lock } from "lucide-react";
 import { formatPrice } from "@/lib/data";
+import { processPayment, formatAmountForRazorpay } from "@/lib/razorpay";
 
 const CheckoutPage = () => {
-  const { items, total, clearCart } = useCartStore();
+  const items = useCartStore((s) => s.items);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
   const { user } = useAuthStore();
   const { createOrder } = useOrdersStore();
   const navigate = useNavigate();
@@ -59,23 +62,61 @@ const CheckoutPage = () => {
 
     setProcessing(true);
     try {
-      // Save order to database
-      await createOrder(user.id, items, total(), address);
-      
-      clearCart();
-      setStep("success");
-      setProcessing(false);
-      toast({
-        title: "Order placed!",
-        description: "Your shoes are being handcrafted.",
-      });
+      // Prepare payment options for Razorpay with UPI enabled
+      const paymentOptions = {
+        amount: formatAmountForRazorpay(total), // Amount in paise
+        currency: "INR",
+        description: `Order for ${items.length} customized shoe${items.length > 1 ? "s" : ""}`,
+        
+        // Prefill customer details
+        prefill: {
+          name: address.name,
+          email: user.email || "customer@cuzaura.com",
+          contact: address.phone || "9000000000",
+        },
+        
+        // Additional order details
+        notes: {
+          items_count: items.length,
+          delivery_address: `${address.street}, ${address.city} - ${address.zip}`,
+          customer_name: address.name,
+        },
+        
+        // Theme customization
+        theme: {
+          color: "#D4AF37", // Gold color
+        },
+      };
+
+      // Process payment through Razorpay
+      const paymentVerified = await processPayment(paymentOptions);
+
+      if (paymentVerified) {
+        // Payment verified successfully, now create order
+        await createOrder(user.id, items, total, address);
+        
+        clearCart();
+        setStep("success");
+        toast({
+          title: "Order Placed Successfully!",
+          description: "Payment verified. Your shoes are being handcrafted.",
+        });
+      } else {
+        toast({
+          title: "Payment Verification Failed",
+          description: "The payment signature could not be verified. Please try again.",
+          variant: "destructive",
+        });
+      }
     } catch (err: any) {
-      setProcessing(false);
+      console.error("Payment error:", err);
       toast({
-        title: "Order failed",
-        description: err.message || "Please try again",
+        title: "Payment Failed",
+        description: err.message || "An error occurred during payment. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -180,25 +221,47 @@ const CheckoutPage = () => {
                 ))}
                 <div className="flex justify-between font-bold text-lg mt-4 pt-4 border-t border-border">
                   <span>Total</span>
-                  <span className="text-gradient">{formatPrice(total())}</span>
+                  <span className="text-gradient">{formatPrice(total)}</span>
                 </div>
               </div>
               <div className="bg-secondary rounded-xl p-6">
-                <h3 className="font-display font-semibold mb-4">Payment (Demo)</h3>
-                <Input placeholder="Card Number" defaultValue="4242 4242 4242 4242" className="bg-muted border-border py-6 mb-3" />
-                <div className="grid grid-cols-2 gap-3">
-                  <Input placeholder="MM/YY" defaultValue="12/28" className="bg-muted border-border py-6" />
-                  <Input placeholder="CVC" defaultValue="123" className="bg-muted border-border py-6" />
+                <h3 className="font-display font-semibold mb-4 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-gold" />
+                  Secure Payment Gateway
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Your payment will be processed securely through <span className="font-semibold text-foreground">Razorpay</span>, India's leading payment service.
+                </p>
+                <div className="bg-muted rounded-lg p-4 border border-border mb-4">
+                  <p className="text-xs text-muted-foreground">
+                    💳 <span className="font-semibold">Payment Method:</span> Debit/Credit Cards, UPI, Wallets, and more
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    🔒 <span className="font-semibold">Security:</span> Your payment details are encrypted and secured
+                  </p>
                 </div>
               </div>
               <Button
                 size="lg"
-                className="w-full glow-gold py-6 font-semibold"
+                className="w-full glow-gold py-6 font-semibold text-base flex items-center justify-center gap-2"
                 onClick={handlePayment}
                 disabled={processing}
               >
-                {processing ? "Processing..." : `Pay ${formatPrice(total())}`}
+                {processing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Processing Payment...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    Pay {formatPrice(total)} Securely
+                  </>
+                )}
               </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                By clicking pay, you agree to place this order. No charges will be made until payment is verified.
+              </p>
             </motion.div>
           )}
         </motion.div>

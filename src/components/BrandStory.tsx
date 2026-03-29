@@ -31,9 +31,9 @@ const BrandStory = () => {
   }, [paginate]);
 
   const variants = {
-    enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0, scale: 0.9 }),
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit: (d: number) => ({ x: d < 0 ? 300 : -300, opacity: 0, scale: 0.9 }),
+    enter: (d: number) => ({ x: d > 0 ? 200 : -200, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (d: number) => ({ x: d < 0 ? 200 : -200, opacity: 0 }),
   };
 
   return (
