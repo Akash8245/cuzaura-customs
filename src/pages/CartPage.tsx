@@ -59,7 +59,7 @@ const CartPage = () => {
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display text-5xl font-bold mb-12">Cart</h1>
+          <h1 className="font-display text-3xl sm:text-5xl font-bold mb-8 sm:mb-12">Cart</h1>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-12">
