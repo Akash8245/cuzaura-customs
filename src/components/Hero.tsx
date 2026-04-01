@@ -56,7 +56,7 @@ const Hero = memo(() => (
           initial={{ opacity: 0, scale: 0.85, rotate: -5 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-          className="flex justify-center relative"
+          className="flex justify-center relative order-1 md:order-2"
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-80 h-80 rounded-full bg-gold/[0.04] blur-[60px]" />
