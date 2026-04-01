@@ -36,7 +36,7 @@ const CustomizePage = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative bg-secondary rounded-2xl aspect-square flex items-center justify-center overflow-hidden sticky top-28"
+            className="relative bg-secondary rounded-2xl aspect-square flex items-center justify-center overflow-hidden lg:sticky top-28"
           >
             <div
               className="absolute inset-0 opacity-15 mix-blend-color transition-colors duration-700"
