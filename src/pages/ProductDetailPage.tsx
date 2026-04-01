@@ -205,7 +205,7 @@ const ProductDetailPage = () => {
               <ShoppingBag size={18} /> Add to Cart
             </Button>
 
-            <div className="grid grid-cols-3 gap-4 mt-10 pt-8 border-t border-border">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10 pt-8 border-t border-border">
               {[
                 { icon: Truck, label: "Free Shipping" },
                 { icon: RotateCcw, label: "30-Day Returns" },

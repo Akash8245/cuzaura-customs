@@ -60,7 +60,7 @@ const CollectionPage = () => {
       <div className="container mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-14">
           <span className="text-xs uppercase tracking-[0.4em] text-gold font-medium mb-2 block">Shop</span>
-          <h1 className="font-display text-5xl md:text-6xl font-bold mb-8">Collection</h1>
+          <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold mb-6 sm:mb-8">Collection</h1>
           <div className="flex flex-wrap gap-3">
             {categories.map((c) => (
               <button

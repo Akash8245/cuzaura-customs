@@ -13,12 +13,12 @@ const Hero = memo(() => (
     </div>
 
     <div className="container mx-auto px-6 pt-28 pb-20">
-      <div className="grid md:grid-cols-2 gap-16 items-center">
+      <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-center md:text-left"
+          className="text-center md:text-left order-2 md:order-1"
         >
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -56,7 +56,7 @@ const Hero = memo(() => (
           initial={{ opacity: 0, scale: 0.85, rotate: -5 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-          className="flex justify-center relative"
+          className="flex justify-center relative order-1 md:order-2"
         >
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-80 h-80 rounded-full bg-gold/[0.04] blur-[60px]" />

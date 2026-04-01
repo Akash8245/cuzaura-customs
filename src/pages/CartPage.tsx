@@ -59,7 +59,7 @@ const CartPage = () => {
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display text-5xl font-bold mb-12">Cart</h1>
+          <h1 className="font-display text-3xl sm:text-5xl font-bold mb-8 sm:mb-12">Cart</h1>
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-12">
@@ -76,20 +76,22 @@ const CartPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-secondary rounded-xl p-6 flex gap-6 items-center"
+                className="bg-secondary rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center"
               >
                 <CartItemImage item={item} fallbackImage={fallbackImage} />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-semibold text-foreground">{item.product.name}</h3>
-                  <p className="text-sm text-muted-foreground">{item.customization ? "Bespoke Design" : item.product.color + " Leather"}</p>
+                  <h3 className="font-display font-semibold text-foreground text-sm sm:text-base">{item.product.name}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{item.customization ? "Bespoke Design" : item.product.color + " Leather"}</p>
                   <p className="text-gold font-bold mt-1">{formatPrice(item.product.price)}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-border transition-colors"><Minus size={14} /></button>
-                  <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-border transition-colors"><Plus size={14} /></button>
+                <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-border transition-colors"><Minus size={14} /></button>
+                    <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center hover:bg-border transition-colors"><Plus size={14} /></button>
+                  </div>
+                  <button onClick={() => removeItem(item.product.id)} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={18} /></button>
                 </div>
-                <button onClick={() => removeItem(item.product.id)} className="text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={18} /></button>
               </motion.div>
               );
             })}
