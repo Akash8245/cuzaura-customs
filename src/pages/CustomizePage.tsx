@@ -31,7 +31,7 @@ const CustomizePage = () => {
           <h1 className="font-display text-5xl md:text-6xl font-bold mb-12">Design Your Pair</h1>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           {/* Preview */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
